@@ -28,7 +28,7 @@ create_symlink() {
 }
 
 # Verify we're in the project root
-if [ ! -f "scripts/setup-with-aidlc.sh" ]; then
+if [ ! -f "scripts/aidlc-workflows-setup.sh" ]; then
     echo -e "${RED}Error: Please run this script from the project root directory${NC}"
     exit 1
 fi
