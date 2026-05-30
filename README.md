@@ -45,7 +45,7 @@ This setup script configures AI-DLC for all major AI coding agents:
 2. **Run the setup script:**
 
    ```bash
-   bash scripts/setup-with-aidlc.sh
+   bash scripts/aidlc-workflows-setup.sh
    ```
 
    The script will:
@@ -108,7 +108,7 @@ your-project/
 ├── CLAUDE.md → .vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
 │
 └── scripts/
-    └── setup-with-aidlc.sh       # This setup script
+    └── aidlc-workflows-setup.sh       # This setup script
 ```
 
 ### Key Design Decisions
