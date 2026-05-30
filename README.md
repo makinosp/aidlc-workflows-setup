@@ -92,16 +92,16 @@ your-project/
 │       └── ai-dlc-workflow.mdc   # Generated: FRONTMATTER + core-workflow.md
 │
 ├── .clinerules/
-│   ├── core-workflow.md → ../. vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → ../. vendor/aidlc-workflows/aws-aidlc-rule-details
+│   ├── core-workflow.md → ../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → ../.vendor/aidlc-workflows/aws-aidlc-rule-details
 │
 ├── .claude/
-│   ├── CLAUDE.md → ../. vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → ../. vendor/aidlc-workflows/aws-aidlc-rule-details
+│   ├── CLAUDE.md → ../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → ../.vendor/aidlc-workflows/aws-aidlc-rule-details
 │
 ├── .github/
-│   ├── copilot-instructions.md → ../. vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → ../. vendor/aidlc-workflows/aws-aidlc-rule-details
+│   ├── copilot-instructions.md → ../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → ../.vendor/aidlc-workflows/aws-aidlc-rule-details
 │
 ├── .aidlc-rule-details → .vendor/aidlc-workflows/aws-aidlc-rule-details
 │
