@@ -1,0 +1,227 @@
+# AI-DLC Workflows Setup
+
+This repository provides an automated setup script to integrate [AI-DLC (AI-Driven Development Life Cycle) Workflows](https://github.com/awslabs/aidlc-workflows) into your project using Git submodules and symbolic links.
+
+## What is AI-DLC?
+
+AI-DLC is an intelligent software development workflow that:
+
+- Adapts to your project's complexity and needs
+- Maintains quality standards throughout development
+- Keeps you in control of the AI-assisted development process
+- Works with multiple coding agents and IDEs
+
+Learn more: [AI-DLC GitHub Repository](https://github.com/awslabs/aidlc-workflows)
+
+## Supported Platforms
+
+This setup script configures AI-DLC for all major AI coding agents:
+
+| Platform | Configuration | Verification |
+|----------|---|---|
+| **Kiro** | `.kiro/steering/` | `kiro-cli` → `/context show` |
+| **Amazon Q** | `.amazonq/rules/` | Chat Rules button |
+| **Cursor** | `.cursor/rules/` | Settings → Rules → Project Rules |
+| **Cline** | `.clinerules/` | Rules popover in chat |
+| **Claude Code** | `.claude/` + `CLAUDE.md` | `/config` command |
+| **GitHub Copilot** | `.github/copilot-instructions.md` | `/instructions` command |
+
+## Quick Start
+
+### Prerequisites
+
+- Git with submodule support
+- Bash shell (Linux/macOS)
+- One or more of the supported platforms installed
+
+### Setup
+
+1. **Clone or navigate to this repository:**
+
+   ```bash
+   cd /path/to/your/project
+   ```
+
+2. **Run the setup script:**
+
+   ```bash
+   bash scripts/setup-with-aidlc.sh
+   ```
+
+   The script will:
+
+   - Add `awslabs/aidlc-workflows` as a Git submodule in `.vendor/`
+   - Create platform-specific configuration directories
+   - Set up symbolic links to the core rules and rule details
+   - Generate Cursor's combined rule file (FRONTMATTER + core workflow)
+
+3. **Commit the changes:**
+
+   ```bash
+   git add -A
+   git commit -m "setup: AI-DLC Workflows integration"
+   ```
+
+4. **Verify setup** (see verification commands below)
+
+## Architecture
+
+### Directory Structure
+
+After running the setup script, your project will have:
+
+```
+your-project/
+├── .vendor/
+│   └── aidlc-workflows/          # Git submodule (source of truth)
+│       ├── aws-aidlc-rules/
+│       └── aws-aidlc-rule-details/
+│
+├── .kiro/
+│   ├── steering/
+│   │   └── aws-aidlc-rules → ../../.vendor/aidlc-workflows/aws-aidlc-rules
+│   └── aws-aidlc-rule-details → ../../.vendor/aidlc-workflows/aws-aidlc-rule-details
+│
+├── .amazonq/
+│   ├── rules/
+│   │   └── aws-aidlc-rules → ../../.vendor/aidlc-workflows/aws-aidlc-rules
+│   └── aws-aidlc-rule-details → ../../.vendor/aidlc-workflows/aws-aidlc-rule-details
+│
+├── .cursor/
+│   └── rules/
+│       └── ai-dlc-workflow.mdc   # Generated: FRONTMATTER + core-workflow.md
+│
+├── .clinerules/
+│   ├── core-workflow.md → ../. vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → ../. vendor/aidlc-workflows/aws-aidlc-rule-details
+│
+├── .claude/
+│   ├── CLAUDE.md → ../. vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → ../. vendor/aidlc-workflows/aws-aidlc-rule-details
+│
+├── .github/
+│   ├── copilot-instructions.md → ../. vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → ../. vendor/aidlc-workflows/aws-aidlc-rule-details
+│
+├── .aidlc-rule-details → .vendor/aidlc-workflows/aws-aidlc-rule-details
+│
+├── CLAUDE.md → .vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
+│
+└── scripts/
+    └── setup-with-aidlc.sh       # This setup script
+```
+
+### Key Design Decisions
+
+1. **Single Source of Truth**: All rules are maintained in `.vendor/aidlc-workflows/` (Git submodule)
+2. **Symbolic Links**: Platform-specific configurations use symlinks to avoid duplication
+3. **Cursor Special Handling**: Cursor receives a merged file (FRONTMATTER + core workflow) for proper metadata support
+4. **Git Submodule**: Allows easy updates and reproducibility across team members
+
+## Verification
+
+After setup, verify that rules are properly loaded in each platform:
+
+### Kiro
+
+```bash
+kiro-cli
+/context show
+```
+Look for entries under `.kiro/steering/aws-aidlc-rules`.
+
+### Amazon Q Developer
+
+In the IDE chat window, click the **Rules** button in the lower right corner and verify `aws-aidlc-rules` is listed.
+
+### Cursor IDE
+
+1. Open **Settings** → **Rules** → **Commands**
+2. Under **Project Rules**, confirm you see `ai-dlc-workflow` listed
+3. Verify it's enabled (toggle switch)
+
+### Cline
+
+In the chat interface, look for the **Rules** popover under the chat input field. Verify `core-workflow.md` is listed and active.
+
+### Claude Code
+
+Use the `/config` command to view current configuration and confirm `CLAUDE.md` is active.
+
+### GitHub Copilot
+
+1. Open Copilot Chat panel (Cmd/Ctrl+Shift+I)
+2. Select **Configure Chat** (gear icon) → **Chat Instructions**
+3. Verify `copilot-instructions.md` is listed
+4. Alternatively, type `/instructions` in chat to view active instructions
+
+## Using AI-DLC
+
+Once setup and verified:
+
+1. **Start with "Using AI-DLC..."**: Begin any request with "Using AI-DLC, ..." in your AI agent's chat
+2. **Follow the workflow**: The AI-DLC adaptive workflow activates automatically
+3. **Review and approve**: Carefully review each proposed phase and approve before proceeding
+4. **Monitor artifacts**: All generated artifacts are placed in the `aidlc-docs/` directory
+
+Learn more: [Working with AI-DLC](https://github.com/awslabs/aidlc-workflows/blob/main/docs/WORKING-WITH-AIDLC.md)
+
+## Updating AI-DLC Rules
+
+To update the AI-DLC rules to the latest version:
+
+```bash
+git submodule update --remote --merge
+git add .vendor/aidlc-workflows
+git commit -m "chore: update AI-DLC Workflows to latest version"
+```
+
+All symlinks will automatically point to the updated rules.
+
+## Troubleshooting
+
+### Rules not loading in platform
+
+- Verify symlinks are correct: `ls -la .kiro/steering/`
+- Restart the IDE/agent after setup
+- Check file encodings are UTF-8
+
+### Symlink creation failed
+
+- Run script from project root directory: `cd /path/to/project`
+- Ensure you have write permissions
+- Check disk space availability
+
+### Cursor rule file too large
+
+If `.cursor/rules/ai-dlc-workflow.mdc` exceeds size limits:
+
+- Keep only necessary sections
+- Or use Option 2 from [Cursor setup guide](https://github.com/awslabs/aidlc-workflows#cursor-ide)
+
+### Git submodule issues
+
+Reinitialize submodules:
+
+```bash
+git submodule update --init --recursive
+```
+
+## Contributing
+
+To contribute improvements to this setup script:
+1. Test on multiple platforms
+2. Verify all symlinks work correctly
+3. Submit a pull request with detailed descriptions
+
+## License
+
+This setup script is provided under the MIT-0 License.
+
+AI-DLC Workflows are provided under the MIT-0 License by AWS Labs.
+
+## References
+
+- [AI-DLC GitHub Repository](https://github.com/awslabs/aidlc-workflows)
+- [AI-DLC Methodology Blog](https://aws.amazon.com/blogs/devops/ai-driven-development-life-cycle/)
+- [AI-DLC Method Definition Paper](https://prod.d13rzhkk8cj2z0.amplifyapp.com/)
