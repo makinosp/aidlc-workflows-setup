@@ -128,6 +128,7 @@ After setup, verify that rules are properly loaded in each platform:
 kiro-cli
 /context show
 ```
+
 Look for entries under `.kiro/steering/aws-aidlc-rules`.
 
 ### Amazon Q Developer
@@ -207,18 +208,9 @@ Reinitialize submodules:
 git submodule update --init --recursive
 ```
 
-## Contributing
-
-To contribute improvements to this setup script:
-1. Test on multiple platforms
-2. Verify all symlinks work correctly
-3. Submit a pull request with detailed descriptions
-
 ## License
 
-This setup script is provided under the MIT-0 License.
-
-AI-DLC Workflows are provided under the MIT-0 License by AWS Labs.
+This setup script is provided under the BSD-3 License.
 
 ## References
 
