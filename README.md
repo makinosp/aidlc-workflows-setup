@@ -2,6 +2,8 @@
 
 This repository provides an automated setup script to integrate [AI-DLC (AI-Driven Development Life Cycle) Workflows](https://github.com/awslabs/aidlc-workflows) into your project using Git submodules and symbolic links.
 
+The script is designed to **work from any directory** — it automatically detects the project root via Git or script location.
+
 ## What is AI-DLC?
 
 AI-DLC is an intelligent software development workflow that:
@@ -36,17 +38,29 @@ This setup script configures AI-DLC for all major AI coding agents:
 
 ### Setup
 
-1. **Clone or navigate to this repository:**
+1. **Clone this repository into your project (or copy the script):**
 
    ```bash
-   cd /path/to/your/project
+   git clone https://github.com/makinosp/aidlc-workflows-setup.git
    ```
 
-2. **Run the setup script:**
+2. **Run the setup script from any directory:**
 
    ```bash
-   bash scripts/aidlc-workflows-setup.sh
+   bash /path/to/aidlc-workflows-setup/scripts/aidlc-workflows-setup.sh
    ```
+
+   > The script auto-detects the project root using Git (`git rev-parse --show-toplevel`), falling back to the parent of the script's directory. You do **not** need to `cd` to the project root first.
+
+### One-liner (curl)
+
+Run directly from GitHub without cloning:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/makinosp/aidlc-workflows-setup/refs/heads/main/scripts/aidlc-workflows-setup.sh)"
+```
+
+> This downloads and executes the script in a single command. The auto-detection of the project root ensures it works correctly **no matter which directory you run it from**.
 
    The script will:
 
@@ -73,39 +87,41 @@ After running the setup script, your project will have:
 ```
 your-project/
 ├── .vendor/
-│   └── aidlc-workflows/          # Git submodule (source of truth)
-│       ├── aws-aidlc-rules/
-│       └── aws-aidlc-rule-details/
+│   └── aidlc-workflows/               # Git submodule (source of truth)
+│       └── aidlc-rules/
+│           ├── aws-aidlc-rules/
+│           │   └── core-workflow.md
+│           └── aws-aidlc-rule-details/
 │
 ├── .kiro/
 │   ├── steering/
-│   │   └── aws-aidlc-rules → ../../.vendor/aidlc-workflows/aws-aidlc-rules
-│   └── aws-aidlc-rule-details → ../../.vendor/aidlc-workflows/aws-aidlc-rule-details
+│   │   └── aws-aidlc-rules → …/aidlc-rules/aws-aidlc-rules
+│   └── aws-aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
 │
 ├── .amazonq/
 │   ├── rules/
-│   │   └── aws-aidlc-rules → ../../.vendor/aidlc-workflows/aws-aidlc-rules
-│   └── aws-aidlc-rule-details → ../../.vendor/aidlc-workflows/aws-aidlc-rule-details
+│   │   └── aws-aidlc-rules → …/aidlc-rules/aws-aidlc-rules
+│   └── aws-aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
 │
 ├── .cursor/
 │   └── rules/
-│       └── ai-dlc-workflow.mdc   # Generated: FRONTMATTER + core-workflow.md
+│       └── ai-dlc-workflow.mdc        # Generated: FRONTMATTER + core-workflow.md
 │
 ├── .clinerules/
-│   ├── core-workflow.md → ../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → ../.vendor/aidlc-workflows/aws-aidlc-rule-details
+│   ├── core-workflow.md → …/aidlc-rules/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
 │
 ├── .claude/
-│   ├── CLAUDE.md → ../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → ../.vendor/aidlc-workflows/aws-aidlc-rule-details
+│   ├── CLAUDE.md → …/aidlc-rules/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
 │
 ├── .github/
-│   ├── copilot-instructions.md → ../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → ../.vendor/aidlc-workflows/aws-aidlc-rule-details
+│   ├── copilot-instructions.md → …/aidlc-rules/aws-aidlc-rules/core-workflow.md
+│   └── .aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
 │
-├── .aidlc-rule-details → .vendor/aidlc-workflows/aws-aidlc-rule-details
+├── .aidlc-rule-details → .vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details
 │
-├── CLAUDE.md → .vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md
+├── CLAUDE.md → .vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md
 │
 └── scripts/
     └── aidlc-workflows-setup.sh       # This setup script
@@ -189,8 +205,7 @@ All symlinks will automatically point to the updated rules.
 
 ### Symlink creation failed
 
-- Run script from project root directory: `cd /path/to/project`
-- Ensure you have write permissions
+- Ensure you have write permissions in the project directory
 - Check disk space availability
 
 ### Cursor rule file too large
