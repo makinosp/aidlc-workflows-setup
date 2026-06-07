@@ -2,6 +2,17 @@
 
 set -e  # Exit immediately on error
 
+# --------------------------------------------------
+# Resolve script directory and project root
+# (This enables the script to be run from any location)
+# --------------------------------------------------
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if git -C "$SCRIPT_DIR" rev-parse --show-toplevel > /dev/null 2>&1; then
+    PROJECT_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
+else
+    PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+fi
+
 # Color output constants
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -28,7 +39,7 @@ create_symlink() {
 }
 
 # Verify we're in the project root
-if [ ! -f "scripts/aidlc-workflows-setup.sh" ]; then
+if [ ! -f "$PROJECT_ROOT/scripts/aidlc-workflows-setup.sh" ]; then
     echo -e "${RED}Error: Please run this script from the project root directory${NC}"
     exit 1
 fi
@@ -40,13 +51,15 @@ echo -e "${YELLOW}Starting AI-DLC Workflows setup...${NC}\n"
 # ===============================================
 echo -e "${YELLOW}[1/7] Initializing Git submodule${NC}"
 
-if [ ! -d ".vendor/aidlc-workflows" ]; then
-    git submodule add https://github.com/awslabs/aidlc-workflows.git .vendor/aidlc-workflows
+if [ ! -d "$PROJECT_ROOT/.vendor/aidlc-workflows" ]; then
+    git submodule add https://github.com/awslabs/aidlc-workflows.git "$PROJECT_ROOT/.vendor/aidlc-workflows"
 else
-    echo "  (.vendor/aidlc-workflows already exists)"
+    echo "  ($PROJECT_ROOT/.vendor/aidlc-workflows already exists)"
 fi
 
-git submodule update --init --recursive
+if git -C "$PROJECT_ROOT" submodule update --init --recursive; then
+    :  # success
+fi
 echo -e "${GREEN}✓${NC} Git submodule initialized\n"
 
 # ===============================================
@@ -54,10 +67,10 @@ echo -e "${GREEN}✓${NC} Git submodule initialized\n"
 # ===============================================
 echo -e "${YELLOW}[2/7] Setting up for Kiro${NC}"
 
-mkdir -p .kiro/steering
-create_symlink "../../.vendor/aidlc-workflows/aws-aidlc-rules" ".kiro/steering/aws-aidlc-rules" \
+mkdir -p "$PROJECT_ROOT/.kiro/steering"
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" "$PROJECT_ROOT/.kiro/steering/aws-aidlc-rules" \
     "Kiro steering rules"
-create_symlink "../../.vendor/aidlc-workflows/aws-aidlc-rule-details" ".kiro/aws-aidlc-rule-details" \
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" "$PROJECT_ROOT/.kiro/aws-aidlc-rule-details" \
     "Kiro rule details"
 echo ""
 
@@ -66,10 +79,10 @@ echo ""
 # ===============================================
 echo -e "${YELLOW}[3/7] Setting up for Amazon Q${NC}"
 
-mkdir -p .amazonq/rules
-create_symlink "../../.vendor/aidlc-workflows/aws-aidlc-rules" ".amazonq/rules/aws-aidlc-rules" \
+mkdir -p "$PROJECT_ROOT/.amazonq/rules"
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" "$PROJECT_ROOT/.amazonq/rules/aws-aidlc-rules" \
     "Amazon Q rules"
-create_symlink "../../.vendor/aidlc-workflows/aws-aidlc-rule-details" ".amazonq/aws-aidlc-rule-details" \
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" "$PROJECT_ROOT/.amazonq/aws-aidlc-rule-details" \
     "Amazon Q rule details"
 echo ""
 
@@ -78,21 +91,21 @@ echo ""
 # ===============================================
 echo -e "${YELLOW}[4/7] Setting up for Cursor${NC}"
 
-mkdir -p .cursor/rules
+mkdir -p "$PROJECT_ROOT/.cursor/rules"
 
 # Generate Cursor rule file with FRONTMATTER + core-workflow.md merged
-cat > .cursor/rules/ai-dlc-workflow.mdc << 'EOF'
+cat > "$PROJECT_ROOT/.cursor/rules/ai-dlc-workflow.mdc" << 'EOF'
 ---
 description: "AI-DLC (AI-Driven Development Life Cycle) adaptive workflow for software development"
 alwaysApply: true
 ---
 EOF
 
-cat .vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md >> .cursor/rules/ai-dlc-workflow.mdc
+cat "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" >> "$PROJECT_ROOT/.cursor/rules/ai-dlc-workflow.mdc"
 echo -e "${GREEN}✓${NC} Cursor rule file generated"
 
 # Create symlink for rule details
-create_symlink "../../.vendor/aidlc-workflows/aws-aidlc-rule-details" ".aidlc-rule-details" \
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" "$PROJECT_ROOT/.aidlc-rule-details" \
     "Cursor rule details"
 echo ""
 
@@ -101,10 +114,10 @@ echo ""
 # ===============================================
 echo -e "${YELLOW}[5/7] Setting up for Cline${NC}"
 
-mkdir -p .clinerules
-create_symlink "../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md" ".clinerules/core-workflow.md" \
+mkdir -p "$PROJECT_ROOT/.clinerules"
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" "$PROJECT_ROOT/.clinerules/core-workflow.md" \
     "Cline core workflow"
-create_symlink "../.vendor/aidlc-workflows/aws-aidlc-rule-details" ".clinerules/.aidlc-rule-details" \
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" "$PROJECT_ROOT/.clinerules/.aidlc-rule-details" \
     "Cline rule details"
 echo ""
 
@@ -113,14 +126,14 @@ echo ""
 # ===============================================
 echo -e "${YELLOW}[6/7] Setting up for Claude Code${NC}"
 
-mkdir -p .claude
-create_symlink "../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md" ".claude/CLAUDE.md" \
+mkdir -p "$PROJECT_ROOT/.claude"
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" "$PROJECT_ROOT/.claude/CLAUDE.md" \
     "Claude Code instructions"
-create_symlink "../.vendor/aidlc-workflows/aws-aidlc-rule-details" ".claude/.aidlc-rule-details" \
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" "$PROJECT_ROOT/.claude/.aidlc-rule-details" \
     "Claude Code rule details"
 
 # Create root CLAUDE.md symlink (optional entry point)
-create_symlink ".vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md" "CLAUDE.md" \
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" "$PROJECT_ROOT/CLAUDE.md" \
     "Root CLAUDE.md symlink"
 echo ""
 
@@ -129,10 +142,10 @@ echo ""
 # ===============================================
 echo -e "${YELLOW}[7/7] Setting up for GitHub Copilot${NC}"
 
-mkdir -p .github
-create_symlink "../.vendor/aidlc-workflows/aws-aidlc-rules/core-workflow.md" ".github/copilot-instructions.md" \
+mkdir -p "$PROJECT_ROOT/.github"
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" "$PROJECT_ROOT/.github/copilot-instructions.md" \
     "GitHub Copilot instructions"
-create_symlink "../.vendor/aidlc-workflows/aws-aidlc-rule-details" ".github/.aidlc-rule-details" \
+create_symlink "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" "$PROJECT_ROOT/.github/.aidlc-rule-details" \
     "GitHub Copilot rule details"
 echo ""
 
