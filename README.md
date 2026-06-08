@@ -38,45 +38,33 @@ This setup script configures AI-DLC for all major AI coding agents:
 
 ### Setup
 
-1. **Clone this repository into your project (or copy the script):**
-
-   ```bash
-   git clone https://github.com/makinosp/aidlc-workflows-setup.git
-   ```
-
-2. **Run the setup script from any directory:**
-
-   ```bash
-   bash /path/to/aidlc-workflows-setup/scripts/aidlc-workflows-setup.sh
-   ```
-
-   > The script auto-detects the project root using Git (`git rev-parse --show-toplevel`), falling back to the parent of the script's directory. You do **not** need to `cd` to the project root first.
-
-### One-liner (curl)
-
-Run directly from GitHub without cloning:
+Run the setup script directly from GitHub using curl:
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/makinosp/aidlc-workflows-setup/refs/heads/main/scripts/aidlc-workflows-setup.sh)"
 ```
 
-> This downloads and executes the script in a single command. The auto-detection of the project root ensures it works correctly **no matter which directory you run it from**.
+> This downloads and executes the script in a single command. The script auto-detects the project root using Git (`git rev-parse --show-toplevel`), falling back to the parent of the script's directory. It works correctly **no matter which directory you run it from**.
 
-   The script will:
+The script will:
 
-   - Add `awslabs/aidlc-workflows` as a Git submodule in `.vendor/`
-   - Create platform-specific configuration directories
-   - Set up symbolic links to the core rules and rule details
-   - Generate Cursor's combined rule file (FRONTMATTER + core workflow)
+- Add `awslabs/aidlc-workflows` as a Git submodule in `.vendor/`
+- Create platform-specific configuration directories
+- Set up symbolic links to the core rules and rule details
+- Generate Cursor's combined rule file (FRONTMATTER + core workflow)
 
-3. **Commit the changes:**
+### Commit the changes
 
-   ```bash
-   git add -A
-   git commit -m "setup: AI-DLC Workflows integration"
-   ```
+After the script completes successfully:
 
-4. **Verify setup** (see verification commands below)
+```bash
+git add -A
+git commit -m "setup: AI-DLC Workflows integration"
+```
+
+### Verify setup
+
+See verification commands in the [Verification](#verification) section below.
 
 ## Architecture
 
