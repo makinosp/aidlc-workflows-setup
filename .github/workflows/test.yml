@@ -1,0 +1,45 @@
+# =============================================================================
+# CI workflow for aidlc-workflows-setup
+#
+# Runs the BATS test suite via npx on every push and PR.
+# =============================================================================
+
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [24, 26]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run tests (via npx bats)
+        run: npx --yes bats tests/*.bats
+
+      - name: Show test summary on failure
+        if: failure()
+        run: |
+
+      - name: Show test summary on failure
+        if: failure()
+        run: |
+          echo "::error::Some tests failed. Check the logs above for details."
+          bats --formatter tap tests/*.bats 2>/dev/null || true
