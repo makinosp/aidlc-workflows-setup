@@ -122,10 +122,7 @@ your-project/
 │
 ├── .aidlc-rule-details → .vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details
 │
-├── CLAUDE.md → .vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md
-│
-└── scripts/
-    └── aidlc-workflows-setup.sh       # This setup script
+└── CLAUDE.md → .vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md
 ```
 
 ### Key Design Decisions
