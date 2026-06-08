@@ -1,8 +1,21 @@
 # AI-DLC Workflows Setup
 
+[![License](https://img.shields.io/github/license/makinosp/aidlc-workflows-setup)](https://opensource.org/licenses/BSD-3-Clause)
+
 This repository provides an automated setup script to integrate [AI-DLC (AI-Driven Development Life Cycle) Workflows](https://github.com/awslabs/aidlc-workflows) into your project using Git submodules and symbolic links.
 
 The script is designed to **work from any directory** — it automatically detects the project root via Git or script location.
+
+## Why use this script?
+
+This script streamlines the integration of AI-DLC workflows by automating the following:
+
+- **Submodule Management**: Automatically adds `awslabs/aidlc-workflows` as a Git submodule.
+- **Complex Configuration**: Creates all necessary platform-specific directories (e.g., `.kiro`, `.amazonq`, `.cursor`, etc.).
+- **Symlink Orchestration**: Sets up all symbolic links to ensure a single source of truth while maintaining platform compatibility.
+- **Cursor Optimization**: Automatically generates the specialized `.mdc` file required for Cursor's advanced rule support.
+- **Zero-Config Execution**: Works from any directory without needing to navigate to the project root first.
+- **Seamless Updates**: Makes upgrading AI-DLC rules effortless via Git submodules and symbolic links, ensuring all platform-specific configurations stay in sync.
 
 ## What is AI-DLC?
 
