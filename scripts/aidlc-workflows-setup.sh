@@ -4,12 +4,22 @@ set -e  # Exit immediately on error
 
 # --------------------------------------------------
 # Resolve script directory and project root
-# (This enables the script to be run from any location)
+# (Supports execution from a file or via a pipe, e.g. curl ... | bash)
 # --------------------------------------------------
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# When the script is piped (no real file), BASH_SOURCE[0] is "bash".
+# In that case we assume the current working directory is the project root.
+if [[ -z "${BASH_SOURCE[0]}" || "${BASH_SOURCE[0]}" == "bash" ]]; then
+    SCRIPT_DIR="$(pwd)"
+else
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+
+# Determine the git top‑level directory if we are inside a repo.
 if git -C "$SCRIPT_DIR" rev-parse --show-toplevel > /dev/null 2>&1; then
     PROJECT_ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
 else
+    # Fallback: assume the script lives directly under the project root.
     PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 fi
 
@@ -38,10 +48,15 @@ create_symlink() {
     fi
 }
 
-# Verify we're in the project root
-if [ ! -f "$PROJECT_ROOT/scripts/aidlc-workflows-setup.sh" ]; then
-    echo -e "${RED}Error: Please run this script from the project root directory${NC}"
-    exit 1
+# --------------------------------------------------
+# Verify we are inside the project root (optional)
+# --------------------------------------------------
+# When executed via a pipe there is no script file to check, so skip the check.
+if [[ -n "${BASH_SOURCE[0]}" && "${BASH_SOURCE[0]}" != "bash" ]]; then
+    if [ ! -f "$PROJECT_ROOT/scripts/$(basename "${BASH_SOURCE[0]}")" ]; then
+        echo -e "${RED}Error: Please run this script from the project root directory${NC}"
+        exit 1
+    fi
 fi
 
 echo -e "${YELLOW}Starting AI-DLC Workflows setup...${NC}\n"
