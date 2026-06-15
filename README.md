@@ -46,8 +46,11 @@ This setup script configures AI-DLC for all major AI coding agents:
 ### Prerequisites
 
 - Git with submodule support
-- Bash shell (Linux/macOS)
+- Bash shell (Linux/macOS/WSL2)
 - One or more of the supported platforms installed
+
+> [!NOTE]
+> **Windows users**: This script requires a Unix-like environment. Use WSL2 (Windows Subsystem for Linux), Git Bash, or Cygwin to run the script. Native Windows PowerShell or Command Prompt are not supported due to bash-specific syntax and symbolic link requirements.
 
 ### Setup
 
@@ -179,6 +182,9 @@ Once setup and verified:
 3. **Review and approve**: Carefully review each proposed phase and approve before proceeding
 4. **Monitor artifacts**: All generated artifacts are placed in the `aidlc-docs/` directory
 
+> [!IMPORTANT]
+> Always review and approve each phase of the AI-DLC workflow before proceeding to ensure quality and maintain control over the development process.
+
 Learn more: [Working with AI-DLC](https://github.com/awslabs/aidlc-workflows/blob/main/docs/WORKING-WITH-AIDLC.md)
 
 ## Updating AI-DLC Rules
@@ -191,7 +197,10 @@ git add .vendor/aidlc-workflows
 git commit -m "chore: update AI-DLC Workflows to latest version"
 ```
 
-All symlinks will automatically point to the updated rules.
+> [!NOTE]
+> All symlinks will automatically point to the updated rules after the submodule update.
+
+## Troubleshooting
 
 ## Troubleshooting
 
