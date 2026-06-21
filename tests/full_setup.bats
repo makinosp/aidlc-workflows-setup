@@ -105,10 +105,10 @@ assert_dir() {
     [ "$status" -eq 0 ]
 
     assert_symlink ".kiro/steering/aws-aidlc-rules" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
+        "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
         "Kiro steering rules"
     assert_symlink ".kiro/aws-aidlc-rule-details" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
         "Kiro rule details"
 }
 
@@ -118,10 +118,10 @@ assert_dir() {
     [ "$status" -eq 0 ]
 
     assert_symlink ".amazonq/rules/aws-aidlc-rules" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
+        "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
         "Amazon Q rules"
     assert_symlink ".amazonq/aws-aidlc-rule-details" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
         "Amazon Q rule details"
 }
 
@@ -150,10 +150,10 @@ assert_dir() {
     [ "$status" -eq 0 ]
 
     assert_symlink ".clinerules/core-workflow.md" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
         "Cline core workflow"
     assert_symlink ".clinerules/.aidlc-rule-details" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
         "Cline rule details"
 }
 
@@ -163,13 +163,13 @@ assert_dir() {
     [ "$status" -eq 0 ]
 
     assert_symlink ".claude/CLAUDE.md" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
         "Claude Code instructions"
     assert_symlink ".claude/.aidlc-rule-details" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
         "Claude Code rule details"
     assert_symlink "CLAUDE.md" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
         "Root CLAUDE.md"
 }
 
@@ -179,10 +179,10 @@ assert_dir() {
     [ "$status" -eq 0 ]
 
     assert_symlink ".github/copilot-instructions.md" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
         "GitHub Copilot instructions"
     assert_symlink ".github/.aidlc-rule-details" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
         "GitHub Copilot rule details"
 }
 
@@ -218,9 +218,9 @@ assert_dir() {
 
     # All symlinks should still be valid after second run
     assert_symlink ".github/copilot-instructions.md" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
         "Idempotent: GitHub Copilot symlink"
     assert_symlink ".kiro/steering/aws-aidlc-rules" \
-        "$TEST_TEMP/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
+        "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
         "Idempotent: Kiro steering rules"
 }
