@@ -124,66 +124,35 @@ create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" ".am
 echo ""
 
 # ===============================================
-# Step 4: Setup for Cursor (with special handling)
+# Step 4: Setup for AGENTS.md (multi-agent universal entry point)
 # ===============================================
-echo -e "${YELLOW}[4/7] Setting up for Cursor${NC}"
+echo -e "${YELLOW}[4/7] Setting up for AGENTS.md${NC}"
 
-mkdir -p "$PROJECT_ROOT/.cursor/rules"
+create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" "AGENTS.md" \
+    "AGENTS.md (universal: Cursor, Cline, Codex, Copilot, etc.)"
+echo ""
 
-# Generate Cursor rule file with FRONTMATTER + core-workflow.md merged
-cat > "$PROJECT_ROOT/.cursor/rules/ai-dlc-workflow.mdc" << 'EOF'
----
-description: "AI-DLC (AI-Driven Development Life Cycle) adaptive workflow for software development"
-alwaysApply: true
----
-EOF
+# ===============================================
+# Step 5: Setup for shared .aidlc-rule-details
+# ===============================================
+echo -e "${YELLOW}[5/7] Setting up for shared .aidlc-rule-details${NC}"
 
-cat "$PROJECT_ROOT/.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" >> "$PROJECT_ROOT/.cursor/rules/ai-dlc-workflow.mdc"
-echo -e "${GREEN}✓${NC} Cursor rule file generated"
-
-# Create symlink for rule details
 create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" ".aidlc-rule-details" \
-    "Cursor rule details"
+    "Shared rule details (used by all platforms)"
 echo ""
 
 # ===============================================
-# Step 5: Setup for Cline
-# ===============================================
-echo -e "${YELLOW}[5/7] Setting up for Cline${NC}"
-
-mkdir -p "$PROJECT_ROOT/.clinerules"
-create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" ".clinerules/core-workflow.md" \
-    "Cline core workflow"
-create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" ".clinerules/.aidlc-rule-details" \
-    "Cline rule details"
-echo ""
-
-# ===============================================
-# Step 6: Setup for Claude Code
+# Step 6: Setup for Claude Code (CLAUDE.md only)
 # ===============================================
 echo -e "${YELLOW}[6/7] Setting up for Claude Code${NC}"
 
 mkdir -p "$PROJECT_ROOT/.claude"
 create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" ".claude/CLAUDE.md" \
     "Claude Code instructions"
-create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" ".claude/.aidlc-rule-details" \
-    "Claude Code rule details"
 
 # Create root CLAUDE.md symlink (optional entry point)
 create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" "CLAUDE.md" \
     "Root CLAUDE.md symlink"
-echo ""
-
-# ===============================================
-# Step 7: Setup for GitHub Copilot
-# ===============================================
-echo -e "${YELLOW}[7/7] Setting up for GitHub Copilot${NC}"
-
-mkdir -p "$PROJECT_ROOT/.github"
-create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" ".github/copilot-instructions.md" \
-    "GitHub Copilot instructions"
-create_symlink ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" ".github/.aidlc-rule-details" \
-    "GitHub Copilot rule details"
 echo ""
 
 # ===============================================
@@ -196,10 +165,9 @@ echo -e "${GREEN}========================================${NC}\n"
 echo "Configured platforms:"
 echo "  ✓ Kiro (.kiro/)"
 echo "  ✓ Amazon Q (.amazonq/)"
-echo "  ✓ Cursor (.cursor/)"
-echo "  ✓ Cline (.clinerules/)"
-echo "  ✓ Claude Code (.claude/ + CLAUDE.md)"
-echo "  ✓ GitHub Copilot (.github/)\n"
+echo "  ✓ AGENTS.md (universal: Cursor, Cline, Codex, Copilot, etc.)"
+echo "  ✓ Shared .aidlc-rule-details (used by all platforms)"
+echo "  ✓ Claude Code (.claude/ + CLAUDE.md)\n"
 
 echo "Next steps:"
 echo "  1. Commit changes: git add -A && git commit -m 'setup: AI-DLC Workflows integration'"
@@ -209,7 +177,6 @@ echo "  3. Verify that rules are properly loaded in each platform\n"
 echo "Verification commands:"
 echo "  Kiro CLI:         kiro-cli -> /context show"
 echo "  Amazon Q:         Check Rules button in chat"
-echo "  Cursor:           Settings -> Rules -> Project Rules"
-echo "  Cline:            Check Rules popover under chat input"
+echo "  Cursor/Cline/Codex: Check AGENTS.md in project root"
 echo "  Claude Code:      /config command"
 echo "  GitHub Copilot:   /instructions command"

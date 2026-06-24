@@ -11,11 +11,10 @@ The script is designed to **work from any directory** — it automatically detec
 This script streamlines the integration of AI-DLC workflows by automating the following:
 
 - **Submodule Management**: Automatically adds `awslabs/aidlc-workflows` as a Git submodule.
-- **Complex Configuration**: Creates all necessary platform-specific directories (e.g., `.kiro`, `.amazonq`, `.cursor`, etc.).
-- **Symlink Orchestration**: Sets up all symbolic links to ensure a single source of truth while maintaining platform compatibility.
-- **Cursor Optimization**: Automatically generates the specialized `.mdc` file required for Cursor's advanced rule support.
+- **Unified Configuration**: Creates `AGENTS.md` as a universal entry point for Cursor, Cline, Codex, and GitHub Copilot.
+- **Symlink Orchestration**: Sets up symbolic links to ensure a single source of truth while maintaining platform compatibility.
 - **Zero-Config Execution**: Works from any directory without needing to navigate to the project root first.
-- **Seamless Updates**: Makes upgrading AI-DLC rules effortless via Git submodules and symbolic links, ensuring all platform-specific configurations stay in sync.
+- **Seamless Updates**: Makes upgrading AI-DLC rules effortless via Git submodules and symbolic links.
 
 ## What is AI-DLC?
 
@@ -36,10 +35,11 @@ This setup script configures AI-DLC for all major AI coding agents:
 |----------|---|---|
 | **Kiro** | `.kiro/steering/` | `kiro-cli` → `/context show` |
 | **Amazon Q** | `.amazonq/rules/` | Chat Rules button |
-| **Cursor** | `.cursor/rules/` | Settings → Rules → Project Rules |
-| **Cline** | `.clinerules/` | Rules popover in chat |
+| **Cursor** | `AGENTS.md` (universal) | Settings → Rules → Project Rules |
+| **Cline** | `AGENTS.md` (universal) | Rules popover in chat |
 | **Claude Code** | `.claude/` + `CLAUDE.md` | `/config` command |
-| **GitHub Copilot** | `.github/copilot-instructions.md` | `/instructions` command |
+| **GitHub Copilot** | `AGENTS.md` (universal) | `/instructions` command |
+| **OpenAI Codex** | `AGENTS.md` (universal) | Automatic discovery |
 
 ## Quick Start
 
@@ -67,7 +67,7 @@ The script will:
 - Add `awslabs/aidlc-workflows` as a Git submodule in `.vendor/`
 - Create platform-specific configuration directories
 - Set up symbolic links to the core rules and rule details
-- Generate Cursor's combined rule file (FRONTMATTER + core workflow)
+- Create `AGENTS.md` as a universal entry point for multiple agents
 
 ### Commit the changes
 
@@ -107,21 +107,10 @@ your-project/
 │   │   └── aws-aidlc-rules → …/aidlc-rules/aws-aidlc-rules
 │   └── aws-aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
 │
-├── .cursor/
-│   └── rules/
-│       └── ai-dlc-workflow.mdc        # Generated: FRONTMATTER + core-workflow.md
-│
-├── .clinerules/
-│   ├── core-workflow.md → …/aidlc-rules/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
-│
 ├── .claude/
-│   ├── CLAUDE.md → …/aidlc-rules/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
+│   └── CLAUDE.md → …/aidlc-rules/aws-aidlc-rules/core-workflow.md
 │
-├── .github/
-│   ├── copilot-instructions.md → …/aidlc-rules/aws-aidlc-rules/core-workflow.md
-│   └── .aidlc-rule-details → …/aidlc-rules/aws-aidlc-rule-details
+├── AGENTS.md → .vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md
 │
 ├── .aidlc-rule-details → .vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details
 │
@@ -131,8 +120,8 @@ your-project/
 ### Key Design Decisions
 
 1. **Single Source of Truth**: All rules are maintained in `.vendor/aidlc-workflows/` (Git submodule)
-2. **Symbolic Links**: Platform-specific configurations use symlinks to avoid duplication
-3. **Cursor Special Handling**: Cursor receives a merged file (FRONTMATTER + core workflow) for proper metadata support
+2. **Universal AGENTS.md**: Single `AGENTS.md` serves Cursor, Cline, Codex, and GitHub Copilot
+3. **Shared Rule Details**: `.aidlc-rule-details` is shared across all platforms via symlink
 4. **Git Submodule**: Allows easy updates and reproducibility across team members
 
 ## Verification
@@ -155,12 +144,12 @@ In the IDE chat window, click the **Rules** button in the lower right corner and
 ### Cursor IDE
 
 1. Open **Settings** → **Rules** → **Commands**
-2. Under **Project Rules**, confirm you see `ai-dlc-workflow` listed
+2. Under **Project Rules**, confirm `AGENTS.md` is recognized
 3. Verify it's enabled (toggle switch)
 
 ### Cline
 
-In the chat interface, look for the **Rules** popover under the chat input field. Verify `core-workflow.md` is listed and active.
+In the chat interface, look for the **Rules** popover under the chat input field. Verify `AGENTS.md` is listed and active.
 
 ### Claude Code
 
@@ -170,8 +159,12 @@ Use the `/config` command to view current configuration and confirm `CLAUDE.md` 
 
 1. Open Copilot Chat panel (Cmd/Ctrl+Shift+I)
 2. Select **Configure Chat** (gear icon) → **Chat Instructions**
-3. Verify `copilot-instructions.md` is listed
+3. Verify `AGENTS.md` is listed
 4. Alternatively, type `/instructions` in chat to view active instructions
+
+### OpenAI Codex
+
+Start a Codex session in your project directory. Codex automatically discovers and loads `AGENTS.md` from the project root.
 
 ## Using AI-DLC
 
@@ -202,11 +195,9 @@ git commit -m "chore: update AI-DLC Workflows to latest version"
 
 ## Troubleshooting
 
-## Troubleshooting
-
 ### Rules not loading in platform
 
-- Verify symlinks are correct: `ls -la .kiro/steering/`
+- Verify symlinks are correct: `ls -la AGENTS.md .aidlc-rule-details`
 - Restart the IDE/agent after setup
 - Check file encodings are UTF-8
 
@@ -214,13 +205,6 @@ git commit -m "chore: update AI-DLC Workflows to latest version"
 
 - Ensure you have write permissions in the project directory
 - Check disk space availability
-
-### Cursor rule file too large
-
-If `.cursor/rules/ai-dlc-workflow.mdc` exceeds size limits:
-
-- Keep only necessary sections
-- Or use Option 2 from [Cursor setup guide](https://github.com/awslabs/aidlc-workflows#cursor-ide)
 
 ### Git submodule issues
 
