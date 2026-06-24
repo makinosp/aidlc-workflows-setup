@@ -186,9 +186,12 @@ assert_dir() {
     [ "$status" -eq 0 ]
 
     # All symlinks should still be valid after second run
-    assert_symlink ".github/copilot-instructions.md" \
-        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
-        "Idempotent: GitHub Copilot symlink"
+    assert_symlink "AGENTS.md" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "Idempotent: AGENTS.md symlink"
+    assert_symlink ".aidlc-rule-details" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "Idempotent: Shared rule details"
     assert_symlink ".kiro/steering/aws-aidlc-rules" \
         "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
         "Idempotent: Kiro steering rules"
