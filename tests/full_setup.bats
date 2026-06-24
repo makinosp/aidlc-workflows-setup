@@ -93,10 +93,8 @@ assert_dir() {
 
     assert_dir ".kiro/steering" "Kiro steering dir"
     assert_dir ".amazonq/rules" "Amazon Q rules dir"
-    assert_dir ".cursor/rules" "Cursor rules dir"
-    assert_dir ".clinerules" "Cline rules dir"
     assert_dir ".claude" "Claude dir"
-    assert_dir ".github" "GitHub dir"
+    assert_dir ".aidlc-rule-details" "Shared rule details dir"
 }
 
 @test "creates symlinks for Kiro" {
@@ -125,36 +123,24 @@ assert_dir() {
         "Amazon Q rule details"
 }
 
-@test "creates Cursor .mdc file with frontmatter and core-workflow content" {
+@test "creates AGENTS.md symlink" {
     cd "$TEST_TEMP"
     run bash scripts/aidlc-workflows-setup.sh
     [ "$status" -eq 0 ]
 
-    [ -f ".cursor/rules/ai-dlc-workflow.mdc" ]
-
-    local mdc_content
-    mdc_content="$(<.cursor/rules/ai-dlc-workflow.mdc)"
-
-    # Frontmatter
-    [[ "$mdc_content" == *"description: \"AI-DLC (AI-Driven Development Life Cycle) adaptive workflow for software development\""* ]]
-    [[ "$mdc_content" == *"alwaysApply: true"* ]]
-
-    # Core-workflow content appended
-    [[ "$mdc_content" == *"# Core Workflow"* ]]
-    [[ "$mdc_content" == *"This is the AI-DLC core workflow."* ]]
+    assert_symlink "AGENTS.md" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "AGENTS.md (universal)"
 }
 
-@test "creates symlinks for Cline" {
+@test "creates shared .aidlc-rule-details symlink" {
     cd "$TEST_TEMP"
     run bash scripts/aidlc-workflows-setup.sh
     [ "$status" -eq 0 ]
 
-    assert_symlink ".clinerules/core-workflow.md" \
-        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
-        "Cline core workflow"
-    assert_symlink ".clinerules/.aidlc-rule-details" \
-        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
-        "Cline rule details"
+    assert_symlink ".aidlc-rule-details" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "Shared rule details"
 }
 
 @test "creates symlinks for Claude Code" {
@@ -165,25 +151,9 @@ assert_dir() {
     assert_symlink ".claude/CLAUDE.md" \
         "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
         "Claude Code instructions"
-    assert_symlink ".claude/.aidlc-rule-details" \
-        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
-        "Claude Code rule details"
     assert_symlink "CLAUDE.md" \
         ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
         "Root CLAUDE.md"
-}
-
-@test "creates symlinks for GitHub Copilot" {
-    cd "$TEST_TEMP"
-    run bash scripts/aidlc-workflows-setup.sh
-    [ "$status" -eq 0 ]
-
-    assert_symlink ".github/copilot-instructions.md" \
-        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
-        "GitHub Copilot instructions"
-    assert_symlink ".github/.aidlc-rule-details" \
-        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
-        "GitHub Copilot rule details"
 }
 
 @test "completion message lists all configured platforms" {
@@ -194,10 +164,9 @@ assert_dir() {
     [[ "$output" == *"AI-DLC Workflows setup completed"* ]]
     [[ "$output" == *"Kiro (.kiro/)"* ]]
     [[ "$output" == *"Amazon Q (.amazonq/)"* ]]
-    [[ "$output" == *"Cursor (.cursor/)"* ]]
-    [[ "$output" == *"Cline (.clinerules/)"* ]]
+    [[ "$output" == *"AGENTS.md (universal: Cursor, Cline, Codex, Copilot, etc.)"* ]]
+    [[ "$output" == *"Shared .aidlc-rule-details (used by all platforms)"* ]]
     [[ "$output" == *"Claude Code (.claude/ + CLAUDE.md)"* ]]
-    [[ "$output" == *"GitHub Copilot (.github/)"* ]]
 }
 
 @test "skips git submodule add when vendor already exists" {
