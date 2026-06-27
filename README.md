@@ -193,11 +193,35 @@ git commit -m "chore: update AI-DLC Workflows to latest version"
 > [!NOTE]
 > All symlinks will automatically point to the updated rules after the submodule update.
 
+## Uninstalling AI-DLC Workflows
+
+To remove AI-DLC Workflows from your project:
+
+```bash
+# 1. Remove symbolic links
+rm -f AGENTS.md CLAUDE.md .aidlc-rule-details
+rm -rf .kiro .amazonq .claude
+
+# 2. Remove the git submodule
+git submodule deinit -f .vendor/aidlc-workflows
+git rm -f .vendor/aidlc-workflows
+rm -rf .git/modules/.vendor/aidlc-workflows
+
+# 3. Remove .gitmodules if no other submodules exist
+# (check with: git config --file .gitmodules --list | grep submodule)
+git rm -f .gitmodules
+
+# 4. Commit the changes
+git add -A
+git commit -m "chore: remove AI-DLC Workflows integration"
+```
+
 ## Troubleshooting
 
 ### Rules not loading in platform
 
 - Verify symlinks are correct: `ls -la AGENTS.md .aidlc-rule-details`
+- Check symlink targets: `readlink AGENTS.md` (should point to `.vendor/aidlc-workflows/...`)
 - Restart the IDE/agent after setup
 - Check file encodings are UTF-8
 
@@ -213,6 +237,32 @@ Reinitialize submodules:
 ```bash
 git submodule update --init --recursive
 ```
+
+If the submodule is corrupted, remove and re-add it:
+
+```bash
+# Remove existing submodule completely
+git submodule deinit -f .vendor/aidlc-workflows
+git rm -f .vendor/aidlc-workflows
+rm -rf .git/modules/.vendor/aidlc-workflows
+
+# Re-add the submodule
+git submodule add https://github.com/awslabs/aidlc-workflows.git .vendor/aidlc-workflows
+```
+
+If `.gitmodules` is corrupted or has conflicting entries:
+
+```bash
+# Check for existing entries
+git config --file .gitmodules --list | grep submodule
+
+# Remove all submodule entries if needed
+git config --remove-section submodule.aidlc-workflows 2>/dev/null || true
+```
+
+### Script fails partway through
+
+The script uses `set -e` and will stop on the first error. Simply re-run the script after fixing the issue — it is idempotent and will skip completed steps. Existing files are backed up with a `.bak.<timestamp>` extension before being replaced.
 
 ## License
 

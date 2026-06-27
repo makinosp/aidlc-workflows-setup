@@ -196,3 +196,90 @@ assert_dir() {
         "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
         "Idempotent: Kiro steering rules"
 }
+
+@test "creates symlinks correctly when realpath is not available" {
+    cd "$TEST_TEMP"
+
+    # Create a wrapper that shadows realpath with a no-op
+    cat > /tmp/no_realpath.sh << 'SHIM'
+#!/bin/bash
+exit 1
+SHIM
+    chmod +x /tmp/no_realpath.sh
+
+    # Run script with a PATH that includes the shim before any realpath
+    run env PATH="/tmp:$PATH" bash scripts/aidlc-workflows-setup.sh
+    [ "$status" -eq 0 ]
+
+    # Verify symlinks point to correct relative targets
+    assert_symlink "AGENTS.md" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "No-realpath: AGENTS.md symlink"
+    assert_symlink ".kiro/steering/aws-aidlc-rules" \
+        "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
+        "No-realpath: Kiro steering rules"
+    assert_symlink ".amazonq/rules/aws-aidlc-rules" \
+        "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
+        "No-realpath: Amazon Q rules"
+    assert_symlink ".claude/CLAUDE.md" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "No-realpath: Claude Code instructions"
+}
+
+@test "backs up existing regular file before creating symlink" {
+    cd "$TEST_TEMP"
+
+    # Create a regular file at AGENTS.md location
+    echo "# My custom AGENTS.md" > "AGENTS.md"
+
+    run bash scripts/aidlc-workflows-setup.sh
+    [ "$status" -eq 0 ]
+
+    # Backup file should exist
+    [ -f AGENTS.md.bak.* ]
+
+    # AGENTS.md should now be a symlink
+    assert_symlink "AGENTS.md" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "Backup: AGENTS.md is now a symlink"
+}
+
+@test "repairs dangling symlinks on re-run" {
+    cd "$TEST_TEMP"
+
+    # Create a dangling symlink
+    ln -s "nonexistent-target" "AGENTS.md"
+
+    run bash scripts/aidlc-workflows-setup.sh
+    [ "$status" -eq 0 ]
+
+    # Should now point to the correct target
+    assert_symlink "AGENTS.md" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "Dangling symlink repaired"
+}
+
+@test "fails with error when git submodule update fails" {
+    cd "$TEST_TEMP"
+
+    # Remove vendor dir completely so the script tries `git submodule add`
+    # with a bad URL, which will fail
+    rm -rf ".vendor/aidlc-workflows"
+
+    # Temporarily replace the script with one that has a bad submodule URL
+    # We'll use a git config hook to make the URL invalid
+    cp "scripts/aidlc-workflows-setup.sh" "scripts/aidlc-workflows-setup.sh.bak"
+
+    # Modify the script to use an invalid URL for the submodule
+    sed -i 's|https://github.com/awslabs/aidlc-workflows.git|https://invalid-host-for-test.example.invalid/awslabs/aidlc-workflows.git|' "scripts/aidlc-workflows-setup.sh"
+
+    run bash scripts/aidlc-workflows-setup.sh
+    local result_status=$status
+
+    # Restore original script
+    mv "scripts/aidlc-workflows-setup.sh.bak" "scripts/aidlc-workflows-setup.sh"
+
+    [ "$result_status" -ne 0 ]
+
+    [[ "$output" == *"Failed to"* ]]
+}
