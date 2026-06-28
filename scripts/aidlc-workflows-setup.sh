@@ -53,6 +53,10 @@ calculate_relative_path() {
     abs_source="${abs_source%/}"
     abs_target_dir="${abs_target_dir%/}"
 
+    # Normalize: resolve /. suffix (when target dir is "." or "./")
+    abs_source="${abs_source%/.}"
+    abs_target_dir="${abs_target_dir%/.}"
+
     # Split into components
     IFS='/' read -ra source_parts <<< "$abs_source"
     IFS='/' read -ra target_parts <<< "$abs_target_dir"
@@ -109,8 +113,8 @@ create_symlink() {
     local target_dir
     target_dir=$(dirname "$target")
     local relative_source
-    if command -v realpath &> /dev/null; then
-        # Use realpath for accuracy when available
+    if command -v realpath &> /dev/null && realpath --relative-to=/ / &> /dev/null; then
+        # Use realpath for accuracy when available (GNU realpath)
         local absolute_source
         if [[ "$source" == /* ]]; then
             absolute_source="$source"
@@ -120,6 +124,7 @@ create_symlink() {
         relative_source=$(realpath --relative-to="$target_dir" "$absolute_source")
     else
         # Fallback: pure Bash relative path calculation
+        # (also used when realpath is BSD/macOS which lacks --relative-to)
         relative_source=$(calculate_relative_path "$source" "$target_dir")
     fi
 

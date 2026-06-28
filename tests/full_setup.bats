@@ -226,6 +226,56 @@ SHIM
         "No-realpath: Claude Code instructions"
 }
 
+@test "uses Bash fallback when realpath lacks --relative-to (BSD/macOS)" {
+    cd "$TEST_TEMP"
+
+    # Create a fake realpath that only accepts BSD-style options (-q)
+    fake_realpath_dir="$TEST_TEMP/fake-bin"
+    mkdir -p "$fake_realpath_dir"
+    cat > "$fake_realpath_dir/realpath" << 'SHIM'
+#!/bin/bash
+for arg in "$@"; do
+    if [[ "$arg" == "--relative-to" || "$arg" == --relative-to=* ]]; then
+        echo "realpath: illegal option -- -" >&2
+        echo "usage: realpath [-q] [path ...]" >&2
+        exit 1
+    fi
+done
+# For simple paths without --relative-to, just resolve (no-op for absolute paths)
+for arg in "$@"; do
+    echo "$arg"
+done
+SHIM
+    chmod +x "$fake_realpath_dir/realpath"
+
+    # Run script with fake realpath in PATH
+    run env PATH="$fake_realpath_dir:$PATH" bash scripts/aidlc-workflows-setup.sh
+    [ "$status" -eq 0 ]
+
+    # Verify all symlinks are correct (Bash fallback was used)
+    assert_symlink "AGENTS.md" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "BSD-realpath: AGENTS.md symlink"
+    assert_symlink ".kiro/steering/aws-aidlc-rules" \
+        "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
+        "BSD-realpath: Kiro steering rules"
+    assert_symlink ".amazonq/rules/aws-aidlc-rules" \
+        "../../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules" \
+        "BSD-realpath: Amazon Q rules"
+    assert_symlink ".amazonq/aws-aidlc-rule-details" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "BSD-realpath: Amazon Q rule details"
+    assert_symlink ".aidlc-rule-details" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rule-details" \
+        "BSD-realpath: Shared rule details"
+    assert_symlink ".claude/CLAUDE.md" \
+        "../.vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "BSD-realpath: Claude Code instructions"
+    assert_symlink "CLAUDE.md" \
+        ".vendor/aidlc-workflows/aidlc-rules/aws-aidlc-rules/core-workflow.md" \
+        "BSD-realpath: Root CLAUDE.md"
+}
+
 @test "backs up existing regular file before creating symlink" {
     cd "$TEST_TEMP"
 
