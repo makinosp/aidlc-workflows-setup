@@ -149,10 +149,12 @@ echo -e "${YELLOW}Starting AI-DLC Workflows setup...${NC}\n"
 # ===============================================
 echo -e "${YELLOW}[1/6] Initializing Git submodule${NC}"
 
+AIDLC_WORKFLOWS_REPO_URL="${AIDLC_WORKFLOWS_REPO_URL:-https://github.com/awslabs/aidlc-workflows.git}"
+
 if [ ! -d "$PROJECT_ROOT/.vendor/aidlc-workflows" ]; then
-    if ! git submodule add https://github.com/awslabs/aidlc-workflows.git "$PROJECT_ROOT/.vendor/aidlc-workflows"; then
+    if ! git -C "$PROJECT_ROOT" submodule add "$AIDLC_WORKFLOWS_REPO_URL" .vendor/aidlc-workflows; then
         echo -e "${RED}✗ Failed to add git submodule${NC}"
-        echo "  Possible causes: network error, invalid URL, or path already in .gitmodules"
+        echo "  Possible causes: network error, invalid URL, or path already registered"
         echo "  Try: git submodule update --init --recursive"
         exit 1
     fi
