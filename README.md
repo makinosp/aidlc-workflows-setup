@@ -1,6 +1,7 @@
 # AI-DLC Workflows Setup
 
 [![License](https://img.shields.io/github/license/makinosp/aidlc-workflows-setup)](https://opensource.org/licenses/BSD-3-Clause)
+[![Test Status](https://github.com/makinosp/aidlc-workflows-setup/actions/workflows/test.yml/badge.svg)](https://github.com/makinosp/aidlc-workflows-setup/actions)
 
 This repository provides an automated setup script to integrate [AI-DLC (AI-Driven Development Life Cycle) Workflows](https://github.com/awslabs/aidlc-workflows) into your project using Git submodules and symbolic links.
 
